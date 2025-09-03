@@ -10,10 +10,10 @@
         <JSONInputBlock @jsonInput="handleJsonInput" />
       </div>
       <div class="col-block">
-        <FormRulesBlock :formFields="jsonFormFields" />
+        <FormRulesBlock :parsedJSON="parsedJSON" @settingsUpdate="handleSettingsUpdate" />
       </div>
       <div class="col-block">
-        <CodeOutputBlock />
+        <CodeOutputBlock :formFieldSettings="formFieldSettings" />
       </div>
     </div>
   </div>
@@ -24,12 +24,6 @@ import JSONInputBlock from './components/JSONInputBlock.vue'
 import FormRulesBlock from './components/FormRulesBlock.vue'
 import CodeOutputBlock from './components/CodeOutputBlock.vue'
 
-type JsonFormField = {
-  key: any
-  value: any
-  type: any
-}
-
 export default {
   components: {
     JSONInputBlock,
@@ -39,7 +33,8 @@ export default {
   data() {
     return {
       jsonInput: '',
-      jsonFormFields: [] as Array<JsonFormField>,
+      parsedJSON: null,
+      formFieldSettings: [],
     }
   },
   methods: {
@@ -49,26 +44,14 @@ export default {
     },
     parseJSONFields(json: string) {
       try {
-        let parsedJSON = JSON.parse(json)
-        console.log('Parsed JSON:', parsedJSON)
-        this.generateFormFields(parsedJSON)
+        this.parsedJSON = JSON.parse(json)
       } catch (e) {
         console.error('Invalid JSON:', e)
         return
       }
     },
-    generateFormFields(parsedJSON: Record<string, any>) {
-      Object.entries(parsedJSON).forEach(([key, value]) => {
-        console.log('Property:', key)
-        console.log('Details:', value)
-        console.log('Type:', typeof value)
-        this.jsonFormFields.push({
-          key,
-          value,
-          type: typeof value,
-        })
-      })
-      console.log('Generated Form Fields:', this.jsonFormFields)
+    handleSettingsUpdate(updatedSettings: any) {
+      this.formFieldSettings = updatedSettings
     },
   },
 }

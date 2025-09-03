@@ -1,61 +1,69 @@
 <template lang="">
   <div class="field-block-wrapper">
-    <n-collapse :default-expanded-names="[fieldTitle]">
-      <n-collapse-item :title="fieldTitle" :name="fieldTitle">
-        <div class="field-setting-container">
-          <p>Input Label:</p>
-          <n-input v-model:value="inputLabel" />
-        </div>
-        <div class="field-setting-container">
-          <p>Input Type:</p>
-          <n-select v-model:value="selectedInputType" :options="inputTypes" />
-        </div>
-        <div class="field-setting-container"><n-switch v-model:value="required" /> Required</div>
-        <div style="display: flex; width: 100%">
+    <n-collapse>
+      <n-collapse-item :title="fieldTitle">
+        <form @change="handleFormChange">
           <div class="field-setting-container">
-            <n-checkbox v-model:checked="isMultiple" /> Multiple
+            <p>Input Label:</p>
+            <n-input v-model:value="inputLabel" />
           </div>
           <div class="field-setting-container">
-            <n-radio-group v-if="isMultiple" v-model:value="multiSelectType">
-              <n-radio-button
-                v-for="type in multiSelectTypes"
-                :key="type.value"
-                :value="type.value"
-                :label="type.label"
-              />
-            </n-radio-group>
+            <p>Input Type:</p>
+            <n-select v-model:value="selectedInputType" :options="inputTypes" />
           </div>
-        </div>
-        <div class="field-setting-container">
-          <p>Options:</p>
-          <n-select v-model:value="customSelectOptions" filterable multiple tag />
-        </div>
-        <div class="field-setting-container">
-          <p>Options:</p>
-          <n-select
-            v-model:value="customSelectOptions"
-            filterable
-            multiple
-            tag
-            placeholder="Input Options (for select, radio, checkbox)"
-            :show-arrow="false"
-            :show="false"
-          />
-        </div>
-        <div v-if="selectedInputType == 'number'" style="display: flex; width: 100%">
+          <div style="display: flex; width: 100%">
+            <div class="field-setting-container">
+              <n-switch v-model:value="required" /> Required
+            </div>
+            <div
+              v-if="
+                ['text', 'email', 'url', 'phone', 'address', 'date'].includes(selectedInputType)
+              "
+              class="field-setting-container"
+            >
+              <n-checkbox v-model:checked="isMultiple" />
+              Multiple
+            </div>
+          </div>
+          <div style="display: flex; width: 100%">
+            <div class="field-setting-container">
+              <n-radio-group v-if="isMultiple" v-model:value="multiSelectType">
+                <n-radio-button
+                  v-for="type in multiSelectTypes"
+                  :key="type.value"
+                  :value="type.value"
+                  :label="type.label"
+                />
+              </n-radio-group>
+            </div>
+          </div>
+          <div v-if="isMultiple" class="field-setting-container">
+            <p>Options:</p>
+            <n-select
+              v-model:value="customSelectOptions"
+              filterable
+              multiple
+              tag
+              placeholder="Input Options (for select, radio, checkbox)"
+              :show-arrow="false"
+              :show="false"
+            />
+          </div>
+          <div v-if="selectedInputType == 'number'" style="display: flex; width: 100%">
+            <div class="field-setting-container">
+              <p>Min:</p>
+              <n-input-number v-model:value="minValue" clearable />
+            </div>
+            <div class="field-setting-container">
+              <p>Max:</p>
+              <n-input-number v-model:value="maxValue" clearable />
+            </div>
+          </div>
           <div class="field-setting-container">
-            <p>Min:</p>
-            <n-input-number v-model:value="minValue" clearable />
+            <p>Helper Text:</p>
+            <n-input v-model:value="helperText" type="textarea" placeholder="" />
           </div>
-          <div class="field-setting-container">
-            <p>Max:</p>
-            <n-input-number v-model:value="maxValue" clearable />
-          </div>
-        </div>
-        <div class="field-setting-container">
-          <p>Helper Text:</p>
-          <n-input v-model:value="helperText" type="textarea" placeholder="" />
-        </div>
+        </form>
       </n-collapse-item>
     </n-collapse>
   </div>
@@ -72,6 +80,7 @@ import {
   NRadioButton,
   NRadioGroup,
 } from 'naive-ui'
+import moment from 'moment'
 
 export default {
   props: ['formField'],
@@ -91,7 +100,7 @@ export default {
       inputLabel: '',
       selectedInputType: null,
       isMultiple: false,
-      multiSelectType: null,
+      multiSelectType: 'select',
       required: false,
       customSelectOptions: [],
       minValue: null,
@@ -101,8 +110,8 @@ export default {
   },
   computed: {
     fieldTitle() {
-      const capitalized = this.formField.key.charAt(0).toUpperCase() + this.formField.key.slice(1)
-      return capitalized
+      const label = this.inputLabel || this.formField.key
+      return label.charAt(0).toUpperCase() + label.slice(1)
     },
     inputTypes() {
       return [
@@ -112,12 +121,10 @@ export default {
         { label: 'URL', value: 'url' },
         { label: 'Phone', value: 'phone' },
         { label: 'Address', value: 'address' },
+        { label: 'Date Picker', value: 'date' },
 
         // Numeric Types
         { label: 'Number', value: 'number' },
-
-        // Date Types
-        { label: 'Date', value: 'date' },
       ]
     },
     multiSelectTypes() {
@@ -128,15 +135,66 @@ export default {
       ]
     },
   },
+  methods: {
+    setInputType(type, value) {
+      switch (type) {
+        case 'string':
+          if (value.includes('@')) {
+            this.selectedInputType = 'email'
+          } else if (value.includes('http')) {
+            this.selectedInputType = 'url'
+          } else if (moment(value, moment.ISO_8601, true).isValid()) {
+            this.selectedInputType = 'date'
+          } else {
+            this.selectedInputType = 'text'
+          }
+          break
+        case 'number':
+          this.selectedInputType = 'number'
+          break
+        case 'boolean':
+          this.selectedInputType = 'checkbox'
+          break
+        default:
+          this.selectedInputType = 'text'
+      }
+    },
+    handleFormChange() {
+      const settings = {
+        label: this.inputLabel,
+        key: this.inputLabel.toLowerCase(),
+        type: this.selectedInputType,
+        required: this.required,
+        multiple: this.isMultiple,
+        helperText: this.helperText,
+      }
+      if (this.isMultiple) {
+        settings.multiSelectType = this.multiSelectType
+      }
+      if (this.selectedInputType === 'number') {
+        settings.min = this.minValue
+        settings.max = this.maxValue
+      }
+      this.$emit('settingsUpdate', settings)
+    },
+  },
   watch: {
-    // formField: {
-    //   handler(newValue) {
-    //     console.log('   <FieldBlock> name changed:', newValue)
-    //     this.inputLabel = newValue.name
-    //   },
-    //   deep: true,
-    //   immediate: true,
-    // },
+    formField: {
+      immediate: true,
+      handler(newValue) {
+        // Label
+        this.inputLabel = newValue?.name || this.fieldTitle
+
+        // Input Type
+        this.setInputType(newValue?.type, newValue?.value)
+
+        // Select Options
+        this.customSelectOptions.push(newValue?.name || this.fieldTitle)
+
+        // Set initial settings
+        this.handleFormChange()
+      },
+    },
   },
 }
 </script>
