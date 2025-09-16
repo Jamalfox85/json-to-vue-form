@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import JSONInputBlock from './components/JSONInputBlock.vue'
 import FormRulesBlock from './components/FormRulesBlock.vue'
 import CodeOutputBlock from './components/CodeOutputBlock.vue'
@@ -38,11 +38,11 @@ export default {
     }
   },
   methods: {
-    handleJsonInput(json: string) {
+    handleJsonInput(json) {
       this.jsonInput = json
       this.parseJSONFields(json)
     },
-    parseJSONFields(json: string) {
+    parseJSONFields(json) {
       try {
         this.parsedJSON = JSON.parse(json)
       } catch (e) {
@@ -50,7 +50,7 @@ export default {
         return
       }
     },
-    handleSettingsUpdate(updatedSettings: any) {
+    handleSettingsUpdate(updatedSettings) {
       this.formFieldSettings = updatedSettings
     },
   },

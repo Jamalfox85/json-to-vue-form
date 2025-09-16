@@ -22,21 +22,33 @@ export default {
   data() {
     return {
       jsonFormFields: [],
-      formFieldSettings: {},
+      formFieldSettings: [],
     }
   },
   methods: {
     generateFormFields(parsedJSON) {
       Object.entries(parsedJSON).forEach(([key, value]) => {
-        this.jsonFormFields.push({
-          key,
-          value,
-          type: typeof value,
-        })
+        if (typeof value == 'object') {
+          Object.entries(value).forEach(([subKey, subValue]) => {
+            this.jsonFormFields.push({
+              key: `${subKey}`,
+              value: subValue,
+              type: typeof subValue,
+            })
+          })
+        } else {
+          this.jsonFormFields.push({
+            key,
+            value,
+            type: typeof value,
+          })
+        }
+        console.log('Type: ', typeof value)
       })
     },
     updateFormFieldSettings(index, settings) {
       this.formFieldSettings[index] = settings
+      console.log('Form Field Settings:', this.formFieldSettings)
       this.$emit('settingsUpdate', this.formFieldSettings)
     },
   },
@@ -45,6 +57,7 @@ export default {
       immediate: true,
       handler(newVal) {
         if (newVal) {
+          // this currently resets settings on every json change. If a user adds json, tweaks settings, and then updates the json, they'll have to start over. Fix this eventually
           this.jsonFormFields = []
           this.generateFormFields(newVal)
         }

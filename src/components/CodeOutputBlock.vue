@@ -3,28 +3,27 @@
     <h2>Code Output</h2>
     <p>Copy vue component code</p>
     <div class="input-block">
-      <v-ace-editor
-        v-model:value="content"
-        lang="javascript"
-        theme="monokai"
-        style="height: 100%"
-        @change="null"
-      />
+      <n-tabs type="segment" animated @update:value="handleTabChange">
+        <n-tab-pane name="code" tab="Code">
+          <pre><code ref="codeBlock" class="language-html">{{ content }}</code></pre>
+        </n-tab-pane>
+        <n-tab-pane name="preview" tab="Preview">
+          <PreviewPane :content="content" />
+        </n-tab-pane>
+      </n-tabs>
     </div>
   </div>
 </template>
-<script>
-import { VAceEditor } from 'vue3-ace-editor'
-import debounce from 'lodash.debounce'
-import 'ace-builds/src-noconflict/mode-html'
-import 'ace-builds/src-noconflict/mode-javascript'
-import 'ace-builds/src-noconflict/theme-monokai'
-import prettier from 'prettier'
-import parserBabel from 'prettier/parser-babel'
-import parserHtml from 'prettier/parser-html'
 
+<script>
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-dark.css' // pick a theme you like
+import generateComponentString from '@/services/form-items/naiveui-options'
+
+import { NTabs, NTabPane } from 'naive-ui'
+import PreviewPane from './PreviewPane.vue'
 export default {
-  components: { VAceEditor },
+  components: { NTabs, NTabPane, PreviewPane },
   props: ['formFieldSettings'],
   data() {
     return {
@@ -32,24 +31,46 @@ export default {
     }
   },
   methods: {
-    updateContent() {
-      let rawCode = `<template>Test</template>`
-      this.content = rawCode
+    handleChange(value) {
+      this.content = value
     },
+    generateComponent(formFields) {
+      const template = generateComponentString(formFields)
+      this.content = template
+    },
+    highlightCode() {
+      this.$nextTick(() => {
+        if (this.codeBlock) {
+          delete this.codeBlock.dataset.highlighted
+          hljs.highlightElement(this.codeBlock)
+        }
+      })
+    },
+    handleTabChange(newTab) {
+      console.log('NEW TAB:', newTab)
+      if (newTab === 'code') {
+        console.log('PING')
+        this.highlightCode()
+      }
+    },
+  },
+  mounted() {
+    this.codeBlock = this.$refs.codeBlock
   },
   watch: {
     formFieldSettings: {
-      immediate: true,
+      deep: true,
       handler(newVal) {
         if (newVal) {
-          console.log('NEW VALUE:', newVal)
-          this.updateContent()
+          this.generateComponent(newVal)
+          this.highlightCode()
         }
       },
     },
   },
 }
 </script>
+
 <style lang="scss">
 .input-block {
   border: solid 2px red;

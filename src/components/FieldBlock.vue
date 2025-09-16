@@ -2,32 +2,34 @@
   <div class="field-block-wrapper">
     <n-collapse>
       <n-collapse-item :title="fieldTitle">
-        <form @change="handleFormChange">
+        <form>
           <div class="field-setting-container">
             <p>Input Label:</p>
-            <n-input v-model:value="inputLabel" />
+            <n-input v-model:value="form.inputLabel" />
           </div>
           <div class="field-setting-container">
             <p>Input Type:</p>
-            <n-select v-model:value="selectedInputType" :options="inputTypes" />
+            <n-select v-model:value="form.selectedInputType" :options="inputTypes" />
           </div>
           <div style="display: flex; width: 100%">
             <div class="field-setting-container">
-              <n-switch v-model:value="required" /> Required
+              <n-switch v-model:value="form.required" /> Required
             </div>
             <div
               v-if="
-                ['text', 'email', 'url', 'phone', 'address', 'date'].includes(selectedInputType)
+                ['text', 'email', 'url', 'phone', 'address', 'date'].includes(
+                  form.selectedInputType,
+                )
               "
               class="field-setting-container"
             >
-              <n-checkbox v-model:checked="isMultiple" />
+              <n-checkbox v-model:checked="form.isMultiple" />
               Multiple
             </div>
           </div>
           <div style="display: flex; width: 100%">
             <div class="field-setting-container">
-              <n-radio-group v-if="isMultiple" v-model:value="multiSelectType">
+              <n-radio-group v-if="form.isMultiple" v-model:value="multiSelectType">
                 <n-radio-button
                   v-for="type in multiSelectTypes"
                   :key="type.value"
@@ -37,10 +39,10 @@
               </n-radio-group>
             </div>
           </div>
-          <div v-if="isMultiple" class="field-setting-container">
+          <div v-if="form.isMultiple" class="field-setting-container">
             <p>Options:</p>
             <n-select
-              v-model:value="customSelectOptions"
+              v-model:value="form.customSelectOptions"
               filterable
               multiple
               tag
@@ -49,19 +51,19 @@
               :show="false"
             />
           </div>
-          <div v-if="selectedInputType == 'number'" style="display: flex; width: 100%">
+          <div v-if="form.selectedInputType == 'number'" style="display: flex; width: 100%">
             <div class="field-setting-container">
               <p>Min:</p>
-              <n-input-number v-model:value="minValue" clearable />
+              <n-input-number v-model:value="form.minValue" clearable />
             </div>
             <div class="field-setting-container">
               <p>Max:</p>
-              <n-input-number v-model:value="maxValue" clearable />
+              <n-input-number v-model:value="form.maxValue" clearable />
             </div>
           </div>
           <div class="field-setting-container">
             <p>Helper Text:</p>
-            <n-input v-model:value="helperText" type="textarea" placeholder="" />
+            <n-input v-model:value="form.helperText" type="textarea" placeholder="" />
           </div>
         </form>
       </n-collapse-item>
@@ -97,20 +99,22 @@ export default {
   },
   data() {
     return {
-      inputLabel: '',
-      selectedInputType: null,
-      isMultiple: false,
-      multiSelectType: 'select',
-      required: false,
-      customSelectOptions: [],
-      minValue: null,
-      maxValue: null,
-      helperText: '',
+      form: {
+        inputLabel: '',
+        selectedInputType: null,
+        isMultiple: false,
+        multiSelectType: 'select',
+        required: false,
+        customSelectOptions: [],
+        minValue: null,
+        maxValue: null,
+        helperText: '',
+      },
     }
   },
   computed: {
     fieldTitle() {
-      const label = this.inputLabel || this.formField.key
+      const label = this.form.inputLabel || this.formField.key
       return label.charAt(0).toUpperCase() + label.slice(1)
     },
     inputTypes() {
@@ -125,6 +129,9 @@ export default {
 
         // Numeric Types
         { label: 'Number', value: 'number' },
+
+        // Boolean Types
+        { label: 'Checkbox', value: 'checkbox' },
       ]
     },
     multiSelectTypes() {
@@ -140,40 +147,40 @@ export default {
       switch (type) {
         case 'string':
           if (value.includes('@')) {
-            this.selectedInputType = 'email'
+            this.form.selectedInputType = 'email'
           } else if (value.includes('http')) {
-            this.selectedInputType = 'url'
+            this.form.selectedInputType = 'url'
           } else if (moment(value, moment.ISO_8601, true).isValid()) {
-            this.selectedInputType = 'date'
+            this.form.selectedInputType = 'date'
           } else {
-            this.selectedInputType = 'text'
+            this.form.selectedInputType = 'text'
           }
           break
         case 'number':
-          this.selectedInputType = 'number'
+          this.form.selectedInputType = 'number'
           break
         case 'boolean':
-          this.selectedInputType = 'checkbox'
+          this.form.selectedInputType = 'checkbox'
           break
         default:
-          this.selectedInputType = 'text'
+          this.form.selectedInputType = 'text'
       }
     },
     handleFormChange() {
       const settings = {
-        label: this.inputLabel,
-        key: this.inputLabel.toLowerCase(),
-        type: this.selectedInputType,
-        required: this.required,
-        multiple: this.isMultiple,
-        helperText: this.helperText,
+        label: this.form.inputLabel,
+        key: this.form.inputLabel.toLowerCase(),
+        type: this.form.selectedInputType,
+        required: this.form.required,
+        multiple: this.form.isMultiple,
+        helperText: this.form.helperText,
       }
-      if (this.isMultiple) {
-        settings.multiSelectType = this.multiSelectType
+      if (this.form.isMultiple) {
+        settings.multiSelectType = this.form.multiSelectType
       }
-      if (this.selectedInputType === 'number') {
-        settings.min = this.minValue
-        settings.max = this.maxValue
+      if (this.form.selectedInputType === 'number') {
+        settings.min = this.form.minValue
+        settings.max = this.form.maxValue
       }
       this.$emit('settingsUpdate', settings)
     },
@@ -183,15 +190,21 @@ export default {
       immediate: true,
       handler(newValue) {
         // Label
-        this.inputLabel = newValue?.name || this.fieldTitle
+        this.form.inputLabel = newValue?.name || this.fieldTitle
 
         // Input Type
         this.setInputType(newValue?.type, newValue?.value)
 
         // Select Options
-        this.customSelectOptions.push(newValue?.name || this.fieldTitle)
+        this.form.customSelectOptions.push(newValue?.name || this.fieldTitle)
 
         // Set initial settings
+        this.handleFormChange()
+      },
+    },
+    form: {
+      deep: true,
+      handler() {
         this.handleFormChange()
       },
     },
