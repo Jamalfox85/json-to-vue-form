@@ -7,7 +7,7 @@
         v-model:value="content"
         lang="json"
         theme="monokai"
-        style="height: 100%"
+        style="width: 100%"
         @change="debouncedHandleChange"
       />
     </div>
@@ -40,9 +40,18 @@ export default {
 </script>
 <style lang="scss">
 .input-block {
-  border: solid 2px red;
-  width: 450px;
-  height: 800px;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
   margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  .ace_editor,
+  .v-ace-editor {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
 }
 </style>

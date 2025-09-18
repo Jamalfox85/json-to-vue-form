@@ -70,10 +70,11 @@ export default {
 .rules-block {
   border: solid 2px red;
   width: 450px;
-  height: 800px;
   margin-top: 1em;
   display: flex;
   flex-direction: column;
   padding: 1em;
+  flex: 1 1 auto;
+  display: none;
 }
 </style>

@@ -53,11 +53,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.input-block {
-  border: solid 2px red;
-  width: 450px;
-  height: 800px;
-  margin-top: 1em;
-}
-</style>
+<style lang="scss"></style>

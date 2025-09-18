@@ -1,8 +1,6 @@
 <template>
   <div class="app_wrapper">
     <div class="header">
-      <!-- Color Palette -->
-      <!-- https://coolors.co/1be7ff-6eeb83-e4ff1a-e8aa14-ff5714 -->
       <h1 class="primary-header">JSON to Vue Form</h1>
     </div>
     <div class="main">
@@ -13,7 +11,7 @@
         <FormRulesBlock :parsedJSON="parsedJSON" @settingsUpdate="handleSettingsUpdate" />
       </div>
       <div class="col-block">
-        <CodeOutputBlock :formFieldSettings="formFieldSettings" />
+        <!-- <CodeOutputBlock :formFieldSettings="formFieldSettings" /> -->
       </div>
     </div>
   </div>
@@ -61,28 +59,46 @@ export default {
 .app_wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  background-color: #e3e3e3;
+  height: 100vh;
+
   .header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4em;
-    border: solid 2px red;
+    padding: 1em;
+    border-bottom: solid 1px #eee;
+    flex-shrink: 0;
   }
+
   .main {
-    padding: 4em;
     display: flex;
     justify-content: space-evenly;
-    border: solid 2px cyan;
-    width: 100%;
+    flex-wrap: wrap;
+    flex: 1 1 auto;
+    padding: 1em;
+    min-height: 0;
+    overflow: hidden;
+    gap: 1em;
+    border: solid 8px red;
+
     .col-block {
-      border: solid 2px yellow;
-      flex-grow: 1;
+      flex: 1 1 400px;
+      min-width: 300px;
+      padding: 1em;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      border: solid 8px green;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+
       .block-wrapper {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
-        border: solid 2px green;
+        border: solid 8px pink;
       }
     }
   }
