@@ -112,7 +112,11 @@ export default {
 
 <style>
 .preview {
-  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  flex-grow: 1;
+  overflow-y: auto;
   padding: 1em;
 }
 </style>

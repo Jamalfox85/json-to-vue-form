@@ -225,19 +225,4 @@ export default {
     }
   }
 }
-.n-collapse-item {
-  .n-collapse-item__header,
-  .n-collapse-item__content-wrapper {
-    .n-collapse-item__header-main,
-    .n-collapse-item__content-inner,
-    .n-collapse-item-arrow {
-      color: #fff !important;
-    }
-  }
-}
-.n-checkbox {
-  .n-checkbox__label {
-    color: #fff !important;
-  }
-}
 </style>

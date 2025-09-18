@@ -11,7 +11,7 @@
         <FormRulesBlock :parsedJSON="parsedJSON" @settingsUpdate="handleSettingsUpdate" />
       </div>
       <div class="col-block">
-        <!-- <CodeOutputBlock :formFieldSettings="formFieldSettings" /> -->
+        <CodeOutputBlock :formFieldSettings="formFieldSettings" />
       </div>
     </div>
   </div>
@@ -77,7 +77,7 @@ export default {
     min-height: 0;
     overflow: hidden;
     gap: 1em;
-    border: solid 8px red;
+    // border: solid 8px red;
 
     .col-block {
       flex: 1 1 400px;
@@ -86,7 +86,7 @@ export default {
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-      border: solid 8px green;
+      //   border: solid 8px green;
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -98,7 +98,7 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
-        border: solid 8px pink;
+        // border: solid 8px pink;
       }
     }
   }

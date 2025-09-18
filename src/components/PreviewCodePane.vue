@@ -1,5 +1,5 @@
 <template lang="">
-  <div>
+  <div class="preview-code-pane">
     <pre><code ref="codeBlock" class="language-html">{{ content }}</code></pre>
   </div>
 </template>
@@ -25,4 +25,13 @@ export default {
   },
 }
 </script>
-<style lang=""></style>
+<style lang="scss">
+.preview-code-pane {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1em;
+}
+</style>

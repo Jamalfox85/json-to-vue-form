@@ -68,13 +68,13 @@ export default {
 </script>
 <style lang="scss">
 .rules-block {
-  border: solid 2px red;
-  width: 450px;
-  margin-top: 1em;
   display: flex;
   flex-direction: column;
-  padding: 1em;
   flex: 1 1 auto;
-  display: none;
+  width: 450px;
+  height: 0px;
+  overflow-y: auto;
+  margin-top: 1em;
+  padding: 1em;
 }
 </style>
