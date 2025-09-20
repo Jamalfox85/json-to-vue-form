@@ -2,6 +2,9 @@
   <div class="field-block-wrapper">
     <n-collapse>
       <n-collapse-item :title="fieldTitle">
+        <template #header-extra>
+          <n-switch v-model:value="form.active" @click.stop />
+        </template>
         <form>
           <div class="field-setting-container">
             <p>Input Label:</p>
@@ -15,21 +18,14 @@
             <div class="field-setting-container">
               <n-switch v-model:value="form.required" /> Required
             </div>
-            <div
-              v-if="
-                ['text', 'email', 'url', 'phone', 'address', 'date'].includes(
-                  form.selectedInputType,
-                )
-              "
-              class="field-setting-container"
-            >
+            <div v-if="['text'].includes(form.selectedInputType)" class="field-setting-container">
               <n-checkbox v-model:checked="form.isMultiple" />
               Multiple
             </div>
           </div>
           <div style="display: flex; width: 100%">
             <div class="field-setting-container">
-              <n-radio-group v-if="form.isMultiple" v-model:value="multiSelectType">
+              <n-radio-group v-if="form.isMultiple" v-model:value="form.multiSelectType">
                 <n-radio-button
                   v-for="type in multiSelectTypes"
                   :key="type.value"
@@ -100,6 +96,7 @@ export default {
   data() {
     return {
       form: {
+        active: true,
         inputLabel: '',
         selectedInputType: null,
         isMultiple: false,
@@ -172,16 +169,19 @@ export default {
         key: this.form.inputLabel.toLowerCase(),
         type: this.form.selectedInputType,
         required: this.form.required,
-        multiple: this.form.isMultiple,
+        isMultiple: this.form.isMultiple,
         helperText: this.form.helperText,
+        active: this.form.active,
       }
       if (this.form.isMultiple) {
         settings.multiSelectType = this.form.multiSelectType
+        settings.options = this.form.customSelectOptions || []
       }
       if (this.form.selectedInputType === 'number') {
         settings.min = this.form.minValue
         settings.max = this.form.maxValue
       }
+
       this.$emit('settingsUpdate', settings)
     },
   },
@@ -192,11 +192,13 @@ export default {
         // Label
         this.form.inputLabel = newValue?.name || this.fieldTitle
 
+        // Active State
+        if (this.fieldTitle && /id$/i.test(this.fieldTitle)) {
+          this.form.active = false
+        }
+
         // Input Type
         this.setInputType(newValue?.type, newValue?.value)
-
-        // Select Options
-        this.form.customSelectOptions.push(newValue?.name || this.fieldTitle)
 
         // Set initial settings
         this.handleFormChange()

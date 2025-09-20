@@ -3,10 +3,15 @@ import { c } from 'naive-ui'
 export default function generateComponent(formFields) {
   const formFieldChunks = formFields.map((field) => {
     if (!field.type) return
+    if (!field.active) return
     switch (field.type) {
       // String Types
       case 'text':
-        return genTextInput(field)
+        if (field.isMultiple) {
+          return genMultiSelect(field)
+        } else {
+          return genTextInput(field)
+        }
       case 'email':
         return genEmailInput(field)
       case 'url':
@@ -62,8 +67,22 @@ function generateComponentScript(formFields) {
     if (comp && !components.includes(comp)) {
       components.push(comp)
     }
+    if (field.isMultiple) {
+      switch (field.multiSelectType) {
+        case 'select':
+          components.push('NSelect')
+          break
+        case 'radio':
+          components.push('NRadioGroup', 'NRadioButton')
+          break
+        case 'button-group':
+          components.push('NButtonGroup', 'NButton')
+          break
+      }
+    }
   })
 
+  const importString = `import {NForm, NFormItem, NButton, ${components.join(', ')}} from 'naive-ui'`
   const componentString = `components: { NForm, NFormItem, NButton, ${components.join(', ')} }`
 
   const rulesString = `
@@ -90,7 +109,10 @@ function generateComponentScript(formFields) {
     return {
         formRef: null,
         formData: {
-          ${formFields.map((field) => `${field.key}: null`).join(',\n          ')}
+          ${formFields
+            .filter((field) => field.active)
+            .map((field) => `${field.key}: null`)
+            .join(',\n          ')}
         },
         ${rulesString}
     }
@@ -98,17 +120,57 @@ function generateComponentScript(formFields) {
   const methodsString = `
   methods: {
     handleSubmit() {
-      console.log(this.formData)
+      this.$refs.formRef.validate((errors) => {
+        if (!errors) {
+            console.log("✅ Submit:", this.formData);
+        } else {
+            console.log("❌ Validation failed:", errors);
+        }
+    });
     },
   }`
 
   return `<script>
+  ${importString}
+
 export default {
   ${componentString},
   ${dataString},
   ${methodsString}
 }
 </script>`
+}
+
+function genMultiSelect(field) {
+  // Need to define options in compnent data property, b ut can't just call it "options". What if there are multiple multiselect form items
+  let options = field.options.map((option) => {
+    return {
+      label: option.toUpperCase(),
+      value: option,
+    }
+  })
+  switch (field.multiSelectType) {
+    case 'select':
+      return `<n-form-item label="${field.label}" path="${field.key}">
+  <n-select v-model:value="formData.${field.key}" :options="${options}" />
+</n-form-item>`
+    case 'radio':
+      return `<n-form-item label="${field.label}" path="${field.key}">
+  <n-radio-group v-model:value="formData.${field.key}">
+    <n-radio-button v-for="option in ${options}" :key="option.value" :value="option.value">
+      {{ option.label }}
+    </n-radio-button>
+  </n-radio-group>
+</n-form-item>`
+    case 'button-group':
+      return `<n-form-item label="${field.label}" path="${field.key}">
+  <n-button-group v-model:value="formData.${field.key}">
+    <n-button v-for="option in ${options}" :key="option.value" :value="option.value">
+      {{ option.label }}
+    </n-button>
+  </n-button-group>
+</n-form-item>`
+  }
 }
 
 function genTextInput(field) {
@@ -121,6 +183,20 @@ function genEmailInput(field) {
   return `
 <n-form-item label="${field.label}" path="${field.key}">
   <n-input v-model:value="formData.${field.key}" type="email" />
+</n-form-item>`
+}
+
+function genUrlInput(field) {
+  return `
+<n-form-item label="${field.label}" path="${field.key}">
+  <n-input v-model:value="formData.${field.key}" type="url" />
+</n-form-item>`
+}
+
+function genAddressInput(field) {
+  return `
+<n-form-item label="${field.label}" path="${field.key}">
+  <n-input v-model:value="formData.${field.key}" />
 </n-form-item>`
 }
 

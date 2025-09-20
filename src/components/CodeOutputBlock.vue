@@ -44,8 +44,11 @@ export default {
       deep: true,
       handler(newVal) {
         if (newVal) {
-          this.generateComponent(newVal)
-          //   this.highlightCode()
+          if (newVal.length > 0) {
+            this.generateComponent(newVal)
+          } else {
+            this.content = ''
+          }
         }
       },
     },

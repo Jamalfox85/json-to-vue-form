@@ -7,10 +7,10 @@
       <div class="col-block">
         <JSONInputBlock @jsonInput="handleJsonInput" />
       </div>
-      <div class="col-block">
+      <div class="col-block" :class="{ disabled: !parsedJSON }">
         <FormRulesBlock :parsedJSON="parsedJSON" @settingsUpdate="handleSettingsUpdate" />
       </div>
-      <div class="col-block">
+      <div class="col-block" :class="{ disabled: !parsedJSON }">
         <CodeOutputBlock :formFieldSettings="formFieldSettings" />
       </div>
     </div>
@@ -45,7 +45,6 @@ export default {
         this.parsedJSON = JSON.parse(json)
       } catch (e) {
         console.error('Invalid JSON:', e)
-        return
       }
     },
     handleSettingsUpdate(updatedSettings) {
@@ -75,10 +74,7 @@ export default {
     flex: 1 1 auto;
     padding: 1em;
     min-height: 0;
-    overflow: hidden;
     gap: 1em;
-    // border: solid 8px red;
-
     .col-block {
       flex: 1 1 400px;
       min-width: 300px;
@@ -86,11 +82,13 @@ export default {
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-      //   border: solid 8px green;
       display: flex;
       flex-direction: column;
       min-height: 0;
-
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.25;
+      }
       .block-wrapper {
         flex: 1 1 auto;
         min-height: 0;
@@ -98,7 +96,6 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
-        // border: solid 8px pink;
       }
     }
   }

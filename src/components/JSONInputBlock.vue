@@ -32,7 +32,11 @@ export default {
   },
   methods: {
     handleChange(json) {
-      if (json.length === 0) return
+      if (json.length === 0) {
+        json = null
+      } else if (json[json.length - 1] === ',') {
+        json = json.slice(0, -1)
+      }
       this.$emit('jsonInput', json)
     },
   },
@@ -41,7 +45,7 @@ export default {
 <style lang="scss">
 .input-block {
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 400px;
   width: 100%;
   margin-top: 1em;
   display: flex;
