@@ -175,7 +175,12 @@ export default {
       }
       if (this.form.isMultiple) {
         settings.multiSelectType = this.form.multiSelectType
-        settings.options = this.form.customSelectOptions || []
+        settings.options = this.form.customSelectOptions.map((option) => {
+          return {
+            label: option,
+            value: option.toLowerCase().replace(/\s+/g, '-'),
+          }
+        })
       }
       if (this.form.selectedInputType === 'number') {
         settings.min = this.form.minValue

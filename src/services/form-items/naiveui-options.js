@@ -112,7 +112,15 @@ function generateComponentScript(formFields) {
           ${formFields
             .filter((field) => field.active)
             .map((field) => `${field.key}: null`)
-            .join(',\n          ')}
+            .join(',\n          ')},
+
+            ${formFields
+              .filter((field) => field.isMultiple)
+              .map(
+                (field) =>
+                  `${field.key}Options: [${field.options.map((opt) => `{ label: '${opt.label}', value: '${opt.value}' }`).join(', ')}]`,
+              )
+              .join(',\n          ')}
         },
         ${rulesString}
     }
@@ -142,22 +150,15 @@ export default {
 }
 
 function genMultiSelect(field) {
-  // Need to define options in compnent data property, b ut can't just call it "options". What if there are multiple multiselect form items
-  let options = field.options.map((option) => {
-    return {
-      label: option.toUpperCase(),
-      value: option,
-    }
-  })
   switch (field.multiSelectType) {
     case 'select':
       return `<n-form-item label="${field.label}" path="${field.key}">
-  <n-select v-model:value="formData.${field.key}" :options="${options}" />
+  <n-select v-model:value="formData.${field.key}" :options="${field.key}Options" />
 </n-form-item>`
     case 'radio':
       return `<n-form-item label="${field.label}" path="${field.key}">
   <n-radio-group v-model:value="formData.${field.key}">
-    <n-radio-button v-for="option in ${options}" :key="option.value" :value="option.value">
+    <n-radio-button v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
       {{ option.label }}
     </n-radio-button>
   </n-radio-group>
@@ -165,7 +166,7 @@ function genMultiSelect(field) {
     case 'button-group':
       return `<n-form-item label="${field.label}" path="${field.key}">
   <n-button-group v-model:value="formData.${field.key}">
-    <n-button v-for="option in ${options}" :key="option.value" :value="option.value">
+    <n-button v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
       {{ option.label }}
     </n-button>
   </n-button-group>
