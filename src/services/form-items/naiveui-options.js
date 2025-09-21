@@ -68,15 +68,16 @@ function generateComponentScript(formFields) {
       components.push(comp)
     }
     if (field.isMultiple) {
+      console.log('MULTI SELECT: ', field.multiSelectType)
       switch (field.multiSelectType) {
         case 'select':
           components.push('NSelect')
           break
         case 'radio':
-          components.push('NRadioGroup', 'NRadioButton')
+          components.push('NRadioGroup', 'NRadio')
           break
         case 'button-group':
-          components.push('NButtonGroup', 'NButton')
+          components.push('NButtonGroup')
           break
       }
     }
@@ -114,14 +115,14 @@ function generateComponentScript(formFields) {
             .map((field) => `${field.key}: null`)
             .join(',\n          ')},
 
-            ${formFields
-              .filter((field) => field.isMultiple)
-              .map(
-                (field) =>
-                  `${field.key}Options: [${field.options.map((opt) => `{ label: '${opt.label}', value: '${opt.value}' }`).join(', ')}]`,
-              )
-              .join(',\n          ')}
-        },
+            },
+        ${formFields
+          .filter((field) => field.isMultiple)
+          .map(
+            (field) =>
+              `${field.key}Options: [${field.options.map((opt) => `{ label: '${opt.label}', value: '${opt.value}' }`).join(', ')}]`,
+          )
+          .join(',\n          ')},
         ${rulesString}
     }
   }`
@@ -155,14 +156,16 @@ function genMultiSelect(field) {
       return `<n-form-item label="${field.label}" path="${field.key}">
   <n-select v-model:value="formData.${field.key}" :options="${field.key}Options" />
 </n-form-item>`
+
     case 'radio':
       return `<n-form-item label="${field.label}" path="${field.key}">
   <n-radio-group v-model:value="formData.${field.key}">
-    <n-radio-button v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
+    <n-radio v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
       {{ option.label }}
-    </n-radio-button>
+    </n-radio>
   </n-radio-group>
 </n-form-item>`
+
     case 'button-group':
       return `<n-form-item label="${field.label}" path="${field.key}">
   <n-button-group v-model:value="formData.${field.key}">
