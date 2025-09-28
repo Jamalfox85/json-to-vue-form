@@ -1,7 +1,7 @@
 <template>
   <div class="block-wrapper">
     <h2>JSON Input</h2>
-    <p>Enter or paste your example JSON output</p>
+    <p>Enter or paste your target JSON output</p>
     <div class="input-block">
       <v-ace-editor
         v-model:value="content"
@@ -33,28 +33,12 @@ export default {
   },
   methods: {
     handleChange(json) {
-      if (!json || json.trim().length === 0) {
-        this.$emit('jsonInput', null)
-        return
+      if (json.length === 0) {
+        json = null
+      } else if (json[json.length - 1] === ',') {
+        json = json.slice(0, -1)
       }
-
-      try {
-        // Parse the JSON to validate it
-        const parsed = JSON.parse(json)
-
-        // Prettify with 2-space indentation
-        const pretty = JSON.stringify(parsed, null, 2)
-
-        // Update editor content if formatting changed
-        if (pretty !== this.content) {
-          this.content = pretty
-        }
-
-        this.$emit('jsonInput', pretty)
-      } catch (e) {
-        // Invalid JSON — just emit raw text
-        this.$emit('jsonInput', json)
-      }
+      this.$emit('jsonInput', json)
     },
   },
   watch: {

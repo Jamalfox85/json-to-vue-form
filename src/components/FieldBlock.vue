@@ -112,7 +112,10 @@ export default {
   computed: {
     fieldTitle() {
       const label = this.form.inputLabel || this.formField.key
-      return label.charAt(0).toUpperCase() + label.slice(1)
+      return label
+        .split('_') // split into words
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // capitalize each
+        .join(' ') // rejoin with spaces
     },
     inputTypes() {
       return [
@@ -169,7 +172,7 @@ export default {
     handleFormChange() {
       const settings = {
         label: this.form.inputLabel,
-        key: this.form.inputLabel.toLowerCase(),
+        key: this.form.inputLabel.toLowerCase().replace(/\s+/g, '_'),
         type: this.form.selectedInputType,
         required: this.form.required,
         isMultiple: this.form.isMultiple,

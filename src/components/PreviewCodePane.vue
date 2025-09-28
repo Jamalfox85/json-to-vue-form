@@ -3,6 +3,7 @@
     <div class="code-header">
       <button class="copy-btn" @click="copyCode">📋</button>
     </div>
+    <!-- Would love to reuse AceEditor, but that requires a single lang, so doesn't support vue (html, js, and css)-->
     <pre v-if="content"><code ref="codeBlock" class="language-html">{{ content }}</code></pre>
   </div>
 </template>

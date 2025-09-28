@@ -70,7 +70,7 @@ export default {
     },
     setTemplate(templateName) {
       let template = templates[`${templateName}Template`]
-      let templateString = JSON.stringify(template)
+      let templateString = JSON.stringify(template, null, 4)
       this.jsonInput = templateString
       this.templateInput = templateString
       this.templateJSON = templateString

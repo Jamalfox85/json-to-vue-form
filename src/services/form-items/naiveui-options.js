@@ -1,5 +1,3 @@
-import { c } from 'naive-ui'
-
 export default function generateComponent(formFields) {
   const formFieldChunks = generateFormFieldChunks(formFields)
   const formFieldChunksPreviewOnly = generateFormFieldChunks(formFields, true)
@@ -279,13 +277,13 @@ function genCheckboxInput(field, previewOnly) {
 // Univeral Helpers
 function generateLabel(field, previewOnly) {
   if (previewOnly) {
-    return field.label
+    return `${field.label}`
   }
   return `<template #label>
-            ${field.label} ${generateHelperText(field, previewOnly)}
+            ${field.label} ${generateHelperText(field)}
         </template>`
 }
-function generateHelperText(field, previewOnly) {
+function generateHelperText(field) {
   return field.helperText
     ? `
         <n-tooltip trigger="hover">
