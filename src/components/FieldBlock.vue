@@ -112,10 +112,7 @@ export default {
   computed: {
     fieldTitle() {
       const label = this.form.inputLabel || this.formField.key
-      return label
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+      return label.charAt(0).toUpperCase() + label.slice(1)
     },
     inputTypes() {
       return [
@@ -126,6 +123,7 @@ export default {
         { label: 'Phone', value: 'phone' },
         { label: 'Address', value: 'address' },
         { label: 'Date Picker', value: 'date' },
+        { label: 'Password', value: 'password' },
 
         // Numeric Types
         { label: 'Number', value: 'number' },
@@ -152,6 +150,8 @@ export default {
             this.form.selectedInputType = 'url'
           } else if (moment(value, moment.ISO_8601, true).isValid()) {
             this.form.selectedInputType = 'date'
+          } else if (value.includes('password')) {
+            this.form.selectedInputType = 'password'
           } else {
             this.form.selectedInputType = 'text'
           }

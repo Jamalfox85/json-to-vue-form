@@ -56,6 +56,8 @@ function generateFormFieldChunks(formFields, previewOnly = false) {
         return genAddressInput(field, previewOnly)
       case 'date':
         return genDateInput(field, previewOnly)
+      case 'password':
+        return genPasswordInput(field, previewOnly)
 
       // Numeric Types
       case 'number':
@@ -247,6 +249,14 @@ function genDateInput(field, previewOnly) {
 <n-form-item path="${field.key}">
   ${generateLabel(field, previewOnly)}
   <n-date-picker v-model:value="formData.${field.key}" />
+</n-form-item>`
+}
+
+function genPasswordInput(field, previewOnly) {
+  return `
+<n-form-item path="${field.key}">
+  ${generateLabel(field, previewOnly)}
+  <n-input v-model:value="formData.${field.key}" type="password" />
 </n-form-item>`
 }
 
