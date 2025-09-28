@@ -3,12 +3,24 @@
     <div class="header">
       <h1 class="primary-header">JSON to Vue Form</h1>
     </div>
+    <div class="filters">
+      <p style="margin-right: 1em">Form Templates:</p>
+      <n-button @click="setTemplate('signUp')">Sign Up</n-button>
+      <n-button @click="setTemplate('login')">Login</n-button>
+      <n-button @click="setTemplate('payment')">Payment</n-button>
+      <n-button @click="setTemplate('checkout')">Checkout</n-button>
+      <n-button @click="setTemplate('contact')">Contact</n-button>
+    </div>
     <div class="main">
       <div class="col-block">
-        <JSONInputBlock @jsonInput="handleJsonInput" />
+        <JSONInputBlock :templateInput="templateInput" @jsonInput="handleJsonInput" />
       </div>
       <div class="col-block" :class="{ disabled: !parsedJSON }">
-        <FormRulesBlock :parsedJSON="parsedJSON" @settingsUpdate="handleSettingsUpdate" />
+        <FormRulesBlock
+          :templateJSON="templateJSON"
+          :parsedJSON="parsedJSON"
+          @settingsUpdate="handleSettingsUpdate"
+        />
       </div>
       <div class="col-block" :class="{ disabled: !parsedJSON }">
         <CodeOutputBlock :formFieldSettings="formFieldSettings" />
@@ -22,16 +34,22 @@ import JSONInputBlock from './components/JSONInputBlock.vue'
 import FormRulesBlock from './components/FormRulesBlock.vue'
 import CodeOutputBlock from './components/CodeOutputBlock.vue'
 
+import { NButton } from 'naive-ui'
+import * as templates from './form-templates'
+
 export default {
   components: {
     JSONInputBlock,
     FormRulesBlock,
     CodeOutputBlock,
+    NButton,
   },
   data() {
     return {
+      templateInput: '',
       jsonInput: '',
       parsedJSON: null,
+      templateJSON: null,
       formFieldSettings: [],
     }
   },
@@ -50,6 +68,13 @@ export default {
     handleSettingsUpdate(updatedSettings) {
       this.formFieldSettings = updatedSettings
     },
+    setTemplate(templateName) {
+      let template = templates[`${templateName}Template`]
+      let templateString = JSON.stringify(template)
+      this.jsonInput = templateString
+      this.templateInput = templateString
+      this.templateJSON = templateString
+    },
   },
 }
 </script>
@@ -65,6 +90,11 @@ export default {
     padding: 1em;
     border-bottom: solid 1px #eee;
     flex-shrink: 0;
+  }
+  .filters {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .main {

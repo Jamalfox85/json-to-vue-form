@@ -3,6 +3,7 @@
     <h2>Form Settings</h2>
     <p>Set input rules</p>
     <div class="rules-block">
+      <NSpin v-if="loader" />
       <FieldBlock
         v-for="(field, index) in jsonFormFields"
         :key="field"
@@ -14,15 +15,18 @@
 </template>
 <script>
 import FieldBlock from './FieldBlock.vue'
+import { NSpin } from 'naive-ui'
 export default {
-  props: ['parsedJSON'],
+  props: ['parsedJSON', 'templateJSON'],
   components: {
     FieldBlock,
+    NSpin,
   },
   data() {
     return {
       jsonFormFields: [],
       formFieldSettings: {},
+      loader: false,
     }
   },
   methods: {
@@ -79,6 +83,14 @@ export default {
             this.jsonFormFields.push(f)
           }
         })
+        this.loader = false
+      },
+    },
+    templateJSON: {
+      handler(newVal) {
+        this.loader = true
+        this.jsonFormFields = []
+        this.formFieldSettings = {}
       },
     },
   },

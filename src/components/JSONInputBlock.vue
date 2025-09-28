@@ -19,6 +19,7 @@ import debounce from 'lodash.debounce'
 import 'ace-builds/src-noconflict/mode-json'
 import 'ace-builds/src-noconflict/theme-monokai'
 export default {
+  props: ['templateInput'],
   components: { VAceEditor },
   data() {
     return {
@@ -38,6 +39,13 @@ export default {
         json = json.slice(0, -1)
       }
       this.$emit('jsonInput', json)
+    },
+  },
+  watch: {
+    templateInput: {
+      handler(newVal) {
+        this.content = newVal
+      },
     },
   },
 }

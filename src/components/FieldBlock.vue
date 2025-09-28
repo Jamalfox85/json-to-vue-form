@@ -112,7 +112,10 @@ export default {
   computed: {
     fieldTitle() {
       const label = this.form.inputLabel || this.formField.key
-      return label.charAt(0).toUpperCase() + label.slice(1)
+      return label
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
     },
     inputTypes() {
       return [
