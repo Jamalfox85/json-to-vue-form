@@ -77,6 +77,14 @@ export default {
 
         const newFields = this.generateFormFields(newVal)
 
+        // Filter out fields/settings that no longer exist
+        this.jsonFormFields = this.jsonFormFields.filter((f) => newFields.includes(f.key))
+        Object.keys(this.formFieldSettings).forEach((key) => {
+          if (!newFields.includes(key)) {
+            delete this.formFieldSettings[key]
+          }
+        })
+
         // merge: only add fields that don't exist yet
         newFields.forEach((f) => {
           if (!this.jsonFormFields.find((existing) => existing.key === f.key)) {
