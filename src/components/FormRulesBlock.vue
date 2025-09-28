@@ -7,7 +7,7 @@
         v-for="(field, index) in jsonFormFields"
         :key="field"
         :formField="field"
-        @settingsUpdate="updateFormFieldSettings(index, $event)"
+        @settingsUpdate="updateFormFieldSettings(field.key, $event)"
       />
     </div>
   </div>
@@ -22,47 +22,63 @@ export default {
   data() {
     return {
       jsonFormFields: [],
-      formFieldSettings: [],
+      formFieldSettings: {},
     }
   },
   methods: {
     generateFormFields(parsedJSON) {
+      const fields = []
+
       Object.entries(parsedJSON).forEach(([key, value]) => {
-        if (typeof value == 'object') {
+        if (typeof value === 'object') {
           Object.entries(value).forEach(([subKey, subValue]) => {
-            this.jsonFormFields.push({
+            fields.push({
               key: `${subKey}`,
               value: subValue,
               type: typeof subValue,
             })
           })
         } else {
-          this.jsonFormFields.push({
+          fields.push({
             key,
             value,
             type: typeof value,
           })
         }
       })
+
+      return fields
     },
-    updateFormFieldSettings(index, settings) {
-      this.formFieldSettings[index] = settings
-      this.$emit('settingsUpdate', this.formFieldSettings)
+    updateFormFieldSettings(key, settings) {
+      this.formFieldSettings[key] = settings
+
+      // convert settings object back to array
+      const settingsArray = Object.entries(this.formFieldSettings).map(([key, value]) => ({
+        key,
+        ...value,
+      }))
+      this.$emit('settingsUpdate', settingsArray)
     },
   },
   watch: {
     parsedJSON: {
       immediate: true,
       handler(newVal) {
-        if (newVal) {
-          // this currently resets settings on every json change. If a user adds json, tweaks settings, and then updates the json, they'll have to start over. Fix this eventually
+        if (!newVal) {
           this.jsonFormFields = []
-          this.generateFormFields(newVal)
-        } else {
-          this.jsonFormFields = []
-          this.formFieldSettings = []
+          this.formFieldSettings = {}
           this.$emit('settingsUpdate', this.formFieldSettings)
+          return
         }
+
+        const newFields = this.generateFormFields(newVal)
+
+        // merge: only add fields that don't exist yet
+        newFields.forEach((f) => {
+          if (!this.jsonFormFields.find((existing) => existing.key === f.key)) {
+            this.jsonFormFields.push(f)
+          }
+        })
       },
     },
   },
