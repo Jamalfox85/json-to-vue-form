@@ -7,6 +7,7 @@
 <script>
 import * as Vue from 'vue'
 import { compile } from '@vue/compiler-dom'
+
 // import the Naive UI components you expect to inject
 import {
   NForm,
@@ -19,6 +20,7 @@ import {
   NCheckbox,
   NRadioGroup,
   NRadio,
+  NTooltip,
 } from 'naive-ui'
 
 export default {
@@ -52,6 +54,7 @@ export default {
         NCheckbox,
         NRadioGroup,
         NRadio,
+        NTooltip,
       }
 
       const finalComponent = {

@@ -5,10 +5,10 @@
     <div class="input-block">
       <n-tabs type="segment" animated>
         <n-tab-pane name="code" tab="Code">
-          <PreviewCodePane :key="content" :content="content" />
+          <PreviewCodePane :key="exportCode" :content="exportCode" />
         </n-tab-pane>
         <n-tab-pane name="preview" tab="Preview">
-          <PreviewPane :content="content" />
+          <PreviewPane :key="previewCode" :content="previewCode" />
         </n-tab-pane>
       </n-tabs>
     </div>
@@ -26,16 +26,15 @@ export default {
   props: ['formFieldSettings'],
   data() {
     return {
-      content: '',
+      exportCode: '',
+      previewCode: '',
     }
   },
   methods: {
-    handleChange(value) {
-      this.content = value
-    },
     generateComponent(formFields) {
-      const template = generateComponentString(formFields)
-      this.content = template
+      const { exportCode, previewCode } = generateComponentString(formFields)
+      this.exportCode = exportCode
+      this.previewCode = previewCode
     },
   },
   mounted() {},
@@ -47,7 +46,8 @@ export default {
           if (newVal.length > 0) {
             this.generateComponent(newVal)
           } else {
-            this.content = ''
+            this.exportCode = ''
+            this.previewCode = ''
           }
         }
       },

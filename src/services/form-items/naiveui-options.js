@@ -1,41 +1,10 @@
 import { c } from 'naive-ui'
 
 export default function generateComponent(formFields) {
-  const formFieldChunks = formFields.map((field) => {
-    if (!field.type) return
-    if (!field.active) return
-    switch (field.type) {
-      // String Types
-      case 'text':
-        if (field.isMultiple) {
-          return genMultiSelect(field)
-        } else {
-          return genTextInput(field)
-        }
-      case 'email':
-        return genEmailInput(field)
-      case 'url':
-        return genUrlInput(field)
-      case 'phone':
-        return genPhoneInput(field)
-      case 'address':
-        return genAddressInput(field)
-      case 'date':
-        return genDateInput(field)
+  const formFieldChunks = generateFormFieldChunks(formFields)
+  const formFieldChunksPreviewOnly = generateFormFieldChunks(formFields, true)
 
-      // Numeric Types
-      case 'number':
-        return genNumberInput(field)
-
-      // Boolean Types
-      case 'checkbox':
-        return genCheckboxInput(field)
-
-      default:
-        return ''
-    }
-  })
-  const template = `
+  const exportTemplate = `
 <template>
   <n-form ref="formRef" @submit.prevent="handleSubmit" :model="formData" :rules="rules">
     ${formFieldChunks.join('\n    ')}
@@ -46,8 +15,61 @@ export default function generateComponent(formFields) {
 </template>
 `
 
+  const previewTemplate = `
+<template>
+  <n-form ref="formRef" @submit.prevent="handleSubmit" :model="formData" :rules="rules">
+    ${formFieldChunksPreviewOnly.join('\n    ')}
+    <n-form-item>
+      <n-button type="primary" @click="handleSubmit">Submit</n-button>
+    </n-form-item>
+  </n-form>
+</template>
+`
+
   const script = generateComponentScript(formFields)
-  return template + script
+
+  return {
+    exportCode: exportTemplate + script,
+    previewCode: previewTemplate + script,
+  }
+}
+
+function generateFormFieldChunks(formFields, previewOnly = false) {
+  const formFieldChunks = formFields.map((field) => {
+    if (!field.type) return
+    if (!field.active) return
+    switch (field.type) {
+      // String Types
+      case 'text':
+        if (field.isMultiple) {
+          return genMultiSelect(field, previewOnly)
+        } else {
+          return genTextInput(field, previewOnly)
+        }
+      case 'email':
+        return genEmailInput(field, previewOnly)
+      case 'url':
+        return genUrlInput(field, previewOnly)
+      case 'phone':
+        return genPhoneInput(field, previewOnly)
+      case 'address':
+        return genAddressInput(field, previewOnly)
+      case 'date':
+        return genDateInput(field, previewOnly)
+
+      // Numeric Types
+      case 'number':
+        return genNumberInput(field, previewOnly)
+
+      // Boolean Types
+      case 'checkbox':
+        return genCheckboxInput(field, previewOnly)
+
+      default:
+        return ''
+    }
+  })
+  return formFieldChunks
 }
 
 function generateComponentScript(formFields) {
@@ -151,18 +173,18 @@ export default {
 </script>`
 }
 
-function genMultiSelect(field) {
+function genMultiSelect(field, previewOnly) {
   switch (field.multiSelectType) {
     case 'select':
       return `<n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-select v-model:value="formData.${field.key}" :options="${field.key}Options" />
 </n-form-item>`
 
     case 'radio':
       return `<n-form-item path="${field.key}">
   <n-radio-group v-model:value="formData.${field.key}">
-    ${generateLabel(field)}
+    ${generateLabel(field, previewOnly)}
     <n-radio v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
       {{ option.label }}
     </n-radio>
@@ -172,7 +194,7 @@ function genMultiSelect(field) {
     case 'button-group':
       return `<n-form-item path="${field.key}">
   <n-button-group v-model:value="formData.${field.key}">
-    ${generateLabel(field)}
+    ${generateLabel(field, previewOnly)}
     <n-button v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
       {{ option.label }}
     </n-button>
@@ -181,76 +203,79 @@ function genMultiSelect(field) {
   }
 }
 
-function genTextInput(field) {
+function genTextInput(field, previewOnly) {
   return `<n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-input v-model:value="formData.${field.key}"  />
 </n-form-item>`
 }
 
-function genEmailInput(field) {
+function genEmailInput(field, previewOnly) {
   return `
 <n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-input v-model:value="formData.${field.key}" type="email" />
 </n-form-item>`
 }
 
-function genUrlInput(field) {
+function genUrlInput(field, previewOnly) {
   return `
 <n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-input v-model:value="formData.${field.key}" type="url" />
 </n-form-item>`
 }
 
-function genAddressInput(field) {
+function genAddressInput(field, previewOnly) {
   return `
 <n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-input v-model:value="formData.${field.key}" />
 </n-form-item>`
 }
 
-function genPhoneInput(field) {
+function genPhoneInput(field, previewOnly) {
   return `
 <n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-input v-model:value="formData.${field.key}" type="tel" />
 </n-form-item>`
 }
 
-function genDateInput(field) {
+function genDateInput(field, previewOnly) {
   return `
 <n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-date-picker v-model:value="formData.${field.key}" />
 </n-form-item>`
 }
 
-function genNumberInput(field) {
+function genNumberInput(field, previewOnly) {
   return `
 <n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-input-number v-model:value="formData.${field.key}" />
 </n-form-item>`
 }
 
-function genCheckboxInput(field) {
+function genCheckboxInput(field, previewOnly) {
   return `
 <n-form-item path="${field.key}">
-  ${generateLabel(field)}
+  ${generateLabel(field, previewOnly)}
   <n-checkbox v-model:value="formData.${field.key}" />
 </n-form-item>`
 }
 
 // Univeral Helpers
-function generateLabel(field) {
+function generateLabel(field, previewOnly) {
+  if (previewOnly) {
+    return field.label
+  }
   return `<template #label>
-            ${field.label} ${generateHelperText(field)}
+            ${field.label} ${generateHelperText(field, previewOnly)}
         </template>`
 }
-function generateHelperText(field) {
+function generateHelperText(field, previewOnly) {
   return field.helperText
     ? `
         <n-tooltip trigger="hover">
