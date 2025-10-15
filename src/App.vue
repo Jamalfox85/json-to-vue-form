@@ -84,7 +84,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: #e3e3e3;
-  height: 100vh;
+  min-height: 100vh;
 
   .header {
     padding: 1em;
@@ -93,6 +93,7 @@ export default {
   }
   .filters {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
   }
