@@ -104,10 +104,10 @@ function generateComponentScript(formFields) {
   })
 
   const importString = `import {NForm, NFormItem, NButton, NTooltip, ${components.join(
-    ', '
+    ', ',
   )}} from 'naive-ui'`
   const componentString = `components: { NForm, NFormItem, NButton, NTooltip, ${components.join(
-    ', '
+    ', ',
   )} }`
 
   let numRules = 0
@@ -150,11 +150,11 @@ ${
           (field) =>
             `${indent(3)}${field.key}Options: [${field.options
               .map((opt) => `{ label: '${opt.label}', value: '${opt.value}' }`)
-              .join(', ')}]`
+              .join(', ')}]`,
         )
         .join(',\n') + ',\n'
     : ''
-}${numRules > 0 ? `${indent(3)}${rulesString.trimStart()}` : ''}
+}${`${indent(3)}${rulesString.trimStart()}`}
 ${indent(2)}}
 ${indent(1)}}`
   const methodsString = `methods: {

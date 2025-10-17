@@ -8,7 +8,10 @@
       }"
     ></div>
     <div class="header glass-bg">
-      <h1 class="primary-header">JSON to Vue Form</h1>
+      <div class="header-left">
+        <img src="@/assets/images/logo-simple-inverse.png" alt="App Logo" class="app-logo" />
+        <h1 class="primary-header">JSON to Vue</h1>
+      </div>
       <div class="header-right">
         <div class="help-icon" @click="showHelpModal = true">
           <font-awesome-icon icon="fa-solid fa-question" />
@@ -218,6 +221,15 @@ export default {
     margin: 1em;
     display: flex;
     justify-content: space-between;
+    .header-left {
+      display: flex;
+      align-items: center;
+      .app-logo {
+        height: 2em;
+        filter: invert(1);
+        margin-right: 1em;
+      }
+    }
     .help-icon {
       border-radius: 50%;
       height: 2.5em;
