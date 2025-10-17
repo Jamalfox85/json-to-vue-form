@@ -62,4 +62,26 @@ export default {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.n-tabs {
+  .n-tabs-nav {
+    .n-tabs-rail {
+      background-color: #0a192f;
+      color: #f5f5f5;
+      border-radius: 8px;
+      .n-tabs-capsule {
+        background-color: rgba(66, 184, 131, 1);
+        border-radius: 8px;
+      }
+      .n-tabs-tab__label {
+        color: #f5f5f575;
+      }
+      .n-tabs-tab--active {
+        .n-tabs-tab__label {
+          color: #f5f5f5;
+        }
+      }
+    }
+  }
+}
+</style>
