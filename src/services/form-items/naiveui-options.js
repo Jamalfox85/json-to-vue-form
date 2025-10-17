@@ -2,14 +2,13 @@ export default function generateComponent(formFields) {
   const formFieldChunks = generateFormFieldChunks(formFields)
   const formFieldChunksPreviewOnly = generateFormFieldChunks(formFields, true)
 
-  const exportTemplate = `
-<template>
-  <n-form ref="formRef" @submit.prevent="handleSubmit" :model="formData" :rules="rules">
-    ${formFieldChunks.join('\n    ')}
-    <n-form-item>
-      <n-button type="primary" @click="handleSubmit">Submit</n-button>
-    </n-form-item>
-  </n-form>
+  const exportTemplate = `<template>
+${indent(1)}<n-form ref="formRef" @submit.prevent="handleSubmit" :model="formData" :rules="rules">
+${formFieldChunks.map((c) => indent(2) + c.trimStart()).join('\n')}
+${indent(2)}<n-form-item>
+${indent(3)}<n-button type="primary" @click="handleSubmit">Submit</n-button>
+${indent(2)}</n-form-item>
+${indent(1)}</n-form>
 </template>
 `
 
@@ -104,71 +103,79 @@ function generateComponentScript(formFields) {
     }
   })
 
-  const importString = `import {NForm, NFormItem, NButton, NTooltip, ${components.join(', ')}} from 'naive-ui'`
-  const componentString = `components: { NForm, NFormItem, NButton, NTooltip, ${components.join(', ')} }`
+  const importString = `import {NForm, NFormItem, NButton, NTooltip, ${components.join(
+    ', '
+  )}} from 'naive-ui'`
+  const componentString = `components: { NForm, NFormItem, NButton, NTooltip, ${components.join(
+    ', '
+  )} }`
 
-  const rulesString = `
-    rules: {
-      ${formFields
-        .map((field) => {
-          if (!field.required) return ''
-          return `
-            ${field.key}: [
-              {
-                required: ${field.required},
-                message: '${field.label} is required',
-                trigger: ['input', 'submit'],
-              },
-            ]
-          `
-        })
-        .filter(Boolean)
-        .join(',')}
-    }
+  let numRules = 0
+  const rulesString = `rules: {
+${
+  formFields
+    .map((field) => {
+      if (!field.required) return ''
+      numRules++
+      return `${indent(4)}${field.key}: [
+${indent(5)}{
+${indent(6)}required: ${field.required},
+${indent(6)}message: '${field.label} is required',
+${indent(6)}trigger: ['input', 'submit'],
+${indent(5)}},
+${indent(4)}]`
+    })
+    .filter(Boolean)
+    .join(',\n') + '\n'
+}
+${indent(3)}}
   `
-  const dataString = `
-  data() {
-    return {
-        formRef: null,
-        formData: {
-          ${formFields
-            .filter((field) => field.active)
-            .map((field) => `${field.key}: null`)
-            .join(',\n          ')}
-
-            },
-        ${formFields
-          .filter((field) => field.isMultiple)
-          .map(
-            (field) =>
-              `${field.key}Options: [${field.options.map((opt) => `{ label: '${opt.label}', value: '${opt.value}' }`).join(', ')}]`,
-          )
-          .join(',\n          ')}
-        ${formFields.some((field) => field.isMultiple) ? `,` : ``}
-
-        ${rulesString}
-    }
-  }`
-  const methodsString = `
-  methods: {
-    handleSubmit() {
-      this.$refs.formRef.validate((errors) => {
-        if (!errors) {
-            console.log("✅ Submit:", this.formData);
-        } else {
-            console.log("❌ Validation failed:", errors);
-        }
-    });
-    },
-  }`
+  const dataString = `data() {
+${indent(2)}return {
+${indent(3)}formRef: null,
+${indent(3)}formData: {
+${
+  formFields.some((f) => f.active)
+    ? formFields
+        .filter((field) => field.active)
+        .map((field) => `${indent(4)}${field.key}: null`)
+        .join(',\n') + '\n'
+    : ''
+}${indent(3)}},
+${
+  formFields.some((f) => f.isMultiple)
+    ? formFields
+        .filter((field) => field.isMultiple)
+        .map(
+          (field) =>
+            `${indent(3)}${field.key}Options: [${field.options
+              .map((opt) => `{ label: '${opt.label}', value: '${opt.value}' }`)
+              .join(', ')}]`
+        )
+        .join(',\n') + ',\n'
+    : ''
+}${numRules > 0 ? `${indent(3)}${rulesString.trimStart()}` : ''}
+${indent(2)}}
+${indent(1)}}`
+  const methodsString = `methods: {
+${indent(2)}handleSubmit() {
+${indent(3)}this.$refs.formRef.validate((errors) => {
+${indent(4)}if (!errors) {
+${indent(5)}console.log("✅ Submit:", this.formData);
+${indent(4)}} else {
+${indent(5)}console.log("❌ Validation failed:", errors);
+${indent(4)}}
+${indent(3)}});
+${indent(2)}},
+${indent(1)}}`
 
   return `<script>
-  ${importString}
+${importString}
 
 export default {
-  ${componentString},
-  ${dataString},
-  ${methodsString}
+${indent(1)}${componentString},
+${indent(1)}${dataString},
+${indent(1)}${methodsString}
 }
 </script>`
 }
@@ -176,112 +183,107 @@ export default {
 function genMultiSelect(field, previewOnly) {
   switch (field.multiSelectType) {
     case 'select':
-      return `<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-select v-model:value="formData.${field.key}" :options="${field.key}Options" />
-</n-form-item>`
+      return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-select v-model:value="formData.${field.key}" :options="${field.key}Options" />
+${indent(2)}</n-form-item>`
 
     case 'radio':
-      return `<n-form-item path="${field.key}">
-  <n-radio-group v-model:value="formData.${field.key}">
-    ${generateLabel(field, previewOnly)}
-    <n-radio v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
-      {{ option.label }}
-    </n-radio>
-  </n-radio-group>
-</n-form-item>`
+      return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}<n-radio-group v-model:value="formData.${field.key}">
+${indent(4)}${generateLabel(field, previewOnly)}
+${indent(4)}<n-radio v-for="option in ${
+        field.key
+      }Options" :key="option.value" :value="option.value">
+${indent(5)}{{ option.label }}
+${indent(4)}</n-radio>
+${indent(3)}</n-radio-group>
+${indent(2)}</n-form-item>`
 
     case 'button-group':
-      return `<n-form-item path="${field.key}">
-  <n-button-group v-model:value="formData.${field.key}">
-    ${generateLabel(field, previewOnly)}
-    <n-button v-for="option in ${field.key}Options" :key="option.value" :value="option.value">
-      {{ option.label }}
-    </n-button>
-  </n-button-group>
-</n-form-item>`
+      return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}<n-button-group v-model:value="formData.${field.key}">
+${indent(4)}${generateLabel(field, previewOnly)}
+${indent(4)}<n-button v-for="option in ${
+        field.key
+      }Options" :key="option.value" :value="option.value">
+${indent(5)}{{ option.label }}
+${indent(4)}</n-button>
+${indent(3)}</n-button-group>
+${indent(2)}</n-form-item>`
   }
 }
 
 function genTextInput(field, previewOnly) {
-  return `<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-input v-model:value="formData.${field.key}"  />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-input v-model:value="formData.${field.key}"  />
+${indent(2)}</n-form-item>`
 }
 
 function genEmailInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-input v-model:value="formData.${field.key}" type="email" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-input v-model:value="formData.${field.key}" type="email" />
+${indent(2)}</n-form-item>`
 }
 
 function genUrlInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-input v-model:value="formData.${field.key}" type="url" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-input v-model:value="formData.${field.key}" type="url" />
+${indent(2)}</n-form-item>`
 }
 
 function genAddressInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-input v-model:value="formData.${field.key}" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-input v-model:value="formData.${field.key}" />
+${indent(2)}</n-form-item>`
 }
 
 function genPhoneInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-input v-model:value="formData.${field.key}" type="tel" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-input v-model:value="formData.${field.key}" type="tel" />
+${indent(2)}</n-form-item>`
 }
 
 function genDateInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-date-picker v-model:value="formData.${field.key}" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-date-picker v-model:value="formData.${field.key}" />
+${indent(2)}</n-form-item>`
 }
 
 function genPasswordInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-input v-model:value="formData.${field.key}" type="password" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-input v-model:value="formData.${field.key}" type="password" />
+${indent(2)}</n-form-item>`
 }
 
 function genNumberInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-input-number v-model:value="formData.${field.key}" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-input-number v-model:value="formData.${field.key}" />
+${indent(2)}</n-form-item>`
 }
 
 function genCheckboxInput(field, previewOnly) {
-  return `
-<n-form-item path="${field.key}">
-  ${generateLabel(field, previewOnly)}
-  <n-checkbox v-model:value="formData.${field.key}" />
-</n-form-item>`
+  return `${indent(2)}<n-form-item path="${field.key}">
+${indent(3)}${generateLabel(field, previewOnly)}
+${indent(3)}<n-checkbox v-model:value="formData.${field.key}" />
+${indent(2)}</n-form-item>`
 }
 
 // Univeral Helpers
+const indent = (level) => '    '.repeat(level)
 function generateLabel(field, previewOnly) {
   if (previewOnly) {
     return `${field.label}`
   }
-  return `<template #label>
-            ${field.label} ${generateHelperText(field)}
-        </template>`
+  return `<template #label>${field.label} ${generateHelperText(field)}</template>`
 }
 function generateHelperText(field) {
   return field.helperText
