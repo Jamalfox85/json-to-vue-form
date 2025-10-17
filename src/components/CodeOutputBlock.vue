@@ -3,7 +3,8 @@
     <h2>Code Output</h2>
     <p>Copy vue component code</p>
     <div class="input-block">
-      <n-tabs type="segment" animated>
+      <NSpin v-if="loading" />
+      <n-tabs v-if="!loading && exportCode && previewCode" type="segment" animated>
         <n-tab-pane name="code" tab="Code">
           <PreviewCodePane :key="exportCode" :content="exportCode" />
         </n-tab-pane>
@@ -18,16 +19,17 @@
 <script>
 import generateComponentString from '@/services/form-items/naiveui-options'
 
-import { NTabs, NTabPane } from 'naive-ui'
+import { NTabs, NTabPane, NSpin } from 'naive-ui'
 import PreviewCodePane from './PreviewCodePane.vue'
 import PreviewPane from './PreviewPane.vue'
 export default {
-  components: { NTabs, NTabPane, PreviewCodePane, PreviewPane },
-  props: ['formFieldSettings'],
+  components: { NTabs, NTabPane, PreviewCodePane, PreviewPane, NSpin },
+  props: ['formFieldSettings', 'loadingProp'],
   data() {
     return {
       exportCode: '',
       previewCode: '',
+      loading: false,
     }
   },
   methods: {
@@ -37,7 +39,6 @@ export default {
       this.previewCode = previewCode
     },
   },
-  mounted() {},
   watch: {
     formFieldSettings: {
       deep: true,
@@ -50,6 +51,11 @@ export default {
             this.previewCode = ''
           }
         }
+      },
+    },
+    loadingProp: {
+      handler(newVal) {
+        this.loading = newVal
       },
     },
   },

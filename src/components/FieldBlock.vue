@@ -229,6 +229,9 @@ export default {
   border: solid 1px #ccc;
   padding: 1em;
   margin-bottom: 1em;
+  background: rgba(66, 184, 131, 0.15);
+  border-radius: 4px;
+
   .field-setting-container {
     flex: 1;
     margin: 4px 4px 8px 4px;

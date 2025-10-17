@@ -9,6 +9,11 @@ import { far } from '@fortawesome/free-regular-svg-icons'
 library.add(fas)
 library.add(far)
 
+/* Naive UI */
+import { createDiscreteApi } from 'naive-ui'
+const { message, dialog } = createDiscreteApi(['message', 'dialog'])
+window.$message = message
+
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)
 

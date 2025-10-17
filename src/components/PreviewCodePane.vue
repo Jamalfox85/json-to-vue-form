@@ -1,32 +1,38 @@
 <template lang="">
   <div class="preview-code-pane">
     <div v-if="content">
-        <div class="code-block-section">
-            <p>Step 1: Install Dependencies</p>
-            <div class="section-header">
-                <button class="copy-btn" @click="copyPackageCode">📋</button>
-            </div>
-            <pre><code ref="packageBlock" class="language-html">{{ packageCode }}</code></pre>
-         </div>
-        <!-- Would love to reuse AceEditor, but that requires a single lang, so doesn't support vue (html, js, and css)-->
-         <div class="code-block-section">
-            <p>Step 2: Review and Copy Code</p>
-            <div class="section-header">
-                <button class="copy-btn" @click="copyCode">📋</button>
-            </div>
-            <pre><code ref="codeBlock" class="language-html">{{ content }}</code></pre>
-         </div>
+      <div class="code-block-section">
+        <div class="section-header">
+          <p>Step 1: Install Dependencies</p>
+          <n-button @click="copyCode(packageCode)"
+            ><font-awesome-icon icon="fa-solid fa-copy"
+          /></n-button>
+        </div>
+        <pre><code ref="packageBlock" class="language-html">{{ packageCode }}</code></pre>
+      </div>
+      <!-- Would love to reuse AceEditor, but that requires a single lang, so doesn't support vue (html, js, and css)-->
+      <div class="code-block-section">
+        <div class="section-header">
+          <p>Step 2: Review and Copy Code</p>
+          <n-button @click="copyCode(content)"
+            ><font-awesome-icon icon="fa-solid fa-copy"
+          /></n-button>
+        </div>
+        <pre><code ref="codeBlock" class="language-html">{{ content }}</code></pre>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css' // pick a theme you like
+import { NButton } from 'naive-ui'
 export default {
   props: ['content'],
-  data(){
+  components: { NButton },
+  data() {
     return {
-        packageCode: "npm install naive-ui",
+      packageCode: 'npm install naive-ui',
     }
   },
   methods: {
@@ -42,21 +48,11 @@ export default {
         }
       })
     },
-    async copyPackageCode() {
-      try {
-        await navigator.clipboard.writeText(this.packageCode)
-        // give user some feedback
-        alert('Copied to clipboard ✅')
-      } catch (err) {
-        console.error('Failed to copy: ', err)
-      }
-    },
-    async copyCode() {
-      if (this.content) {
+    async copyCode(content) {
+      if (content) {
         try {
-          await navigator.clipboard.writeText(this.content)
-          // give user some feedback
-          alert('Copied to clipboard ✅')
+          await navigator.clipboard.writeText(content)
+          window.$message.success('Code copied to clipboard!')
         } catch (err) {
           console.error('Failed to copy: ', err)
         }
@@ -79,24 +75,23 @@ export default {
   flex-grow: 1;
   overflow-y: auto;
   padding: 1em;
+  color: #f5f5f5;
   .code-block-section {
-      margin-bottom: 1.5em;
-      .section-header {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 0.5em;
-        .copy-btn {
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          font-size: 1.2em;
+    margin-bottom: 1.5em;
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5em;
+      .n-button {
+        background: rgba(66, 184, 131, 0.75);
+        border-radius: 4px;
+        &:hover,
+        &:focus {
           color: #fff;
-          transition: opacity 0.2s;
-          &:hover {
-            opacity: 0.7;
-          }
         }
       }
+    }
   }
 }
 </style>

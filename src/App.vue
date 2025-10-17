@@ -100,10 +100,11 @@
           :templateJSON="templateJSON"
           :parsedJSON="parsedJSON"
           @settingsUpdate="handleSettingsUpdate"
+          @loading="loading = $event"
         />
       </div>
       <div class="col-block glass-bg" :class="{ disabled: !parsedJSON }">
-        <CodeOutputBlock :formFieldSettings="formFieldSettings" />
+        <CodeOutputBlock :formFieldSettings="formFieldSettings" :loadingProp="loading" />
       </div>
     </div>
   </div>
@@ -135,6 +136,7 @@ export default {
       templateJSON: null,
       formFieldSettings: [],
       showHelpModal: false,
+      loading: false,
     }
   },
   methods: {
@@ -277,7 +279,7 @@ export default {
           .n-button {
             margin: 0 0.5rem;
             background: rgba(66, 184, 131, 0.15); /* faint Vue green tint */
-            color: #112a4b;
+            color: #fff5f5 !important;
             border-radius: 4px;
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);

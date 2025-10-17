@@ -3,7 +3,7 @@
     <h2>Form Settings</h2>
     <p>Set input rules</p>
     <div class="rules-block">
-      <NSpin v-if="loader" />
+      <NSpin v-if="loading" />
       <FieldBlock
         v-for="(field, index) in jsonFormFields"
         :key="field"
@@ -26,7 +26,7 @@ export default {
     return {
       jsonFormFields: [],
       formFieldSettings: {},
-      loader: false,
+      loading: false,
     }
   },
   methods: {
@@ -91,12 +91,14 @@ export default {
             this.jsonFormFields.push(f)
           }
         })
-        this.loader = false
+        this.loading = false
+        this.$emit('loading', false)
       },
     },
     templateJSON: {
       handler(newVal) {
-        this.loader = true
+        this.loading = true
+        this.$emit('loading', true)
         this.jsonFormFields = []
         this.formFieldSettings = {}
       },
