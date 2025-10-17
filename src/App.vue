@@ -10,11 +10,11 @@
     <div class="header glass-bg">
       <h1 class="primary-header">JSON to Vue Form</h1>
       <div class="header-right">
-        <div class="help-icon" @click="showModal = true">
+        <div class="help-icon" @click="showHelpModal = true">
           <font-awesome-icon icon="fa-solid fa-question" />
         </div>
       </div>
-      <n-modal v-model:show="showModal" class="glass-modal">
+      <n-modal v-model:show="showHelpModal" class="glass-modal">
         <n-card
           title="Build Forms from JSON"
           size="huge"
@@ -26,7 +26,7 @@
           <template #header-extra>
             <font-awesome-icon
               icon="fa-solid fa-xmark"
-              @click="showModal = false"
+              @click="showHelpModal = false"
               style="cursor: pointer"
             />
           </template>
@@ -131,7 +131,7 @@ export default {
       parsedJSON: null,
       templateJSON: null,
       formFieldSettings: [],
-      showModal: false,
+      showHelpModal: false,
     }
   },
   methods: {
@@ -160,6 +160,20 @@ export default {
       this.mousePosition.x = e.clientX
       this.mousePosition.y = e.clientY
     },
+  },
+  mounted() {
+    const lastShown = localStorage.getItem('jsonToVueHelpModalShown')
+    const now = Date.now()
+    const FOUR_HOURS = 4 * 60 * 60 * 1000 // ms
+
+    if (!lastShown || now - parseInt(lastShown, 10) > FOUR_HOURS) {
+      // Show the modal after a small delay
+      setTimeout(() => {
+        this.showHelpModal = true
+        // Record the current timestamp
+        localStorage.setItem('jsonToVueHelpModalShown', now.toString())
+      }, 175)
+    }
   },
 }
 </script>
