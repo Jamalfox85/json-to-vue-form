@@ -237,5 +237,16 @@ export default {
       margin-bottom: 4px;
     }
   }
+  .n-collapse-item {
+    .n-collapse-item__header {
+      .n-collapse-item__header-main {
+        color: #f5f5f5 !important;
+        .n-collapse-item-arrow {
+          color: #f5f5f5 !important;
+        }
+      }
+    }
+    color: #f5f5f5 !important;
+  }
 }
 </style>
