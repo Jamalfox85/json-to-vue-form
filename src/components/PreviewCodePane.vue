@@ -3,7 +3,7 @@
     <div v-if="content">
       <div class="code-block-section">
         <div class="section-header">
-          <p>Step 1: Install Dependencies</p>
+          <p>Step 2: Install Dependencies</p>
           <n-button @click="copyCode(packageCode)"
             ><font-awesome-icon icon="fa-solid fa-copy"
           /></n-button>
@@ -13,7 +13,7 @@
       <!-- Would love to reuse AceEditor, but that requires a single lang, so doesn't support vue (html, js, and css)-->
       <div class="code-block-section">
         <div class="section-header">
-          <p>Step 2: Review and Copy Code</p>
+          <p>Step 3: Review and Copy Code</p>
           <n-button @click="copyCode(content)"
             ><font-awesome-icon icon="fa-solid fa-copy"
           /></n-button>
@@ -26,10 +26,10 @@
 <script>
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css' // pick a theme you like
-import { NButton } from 'naive-ui'
+import { NButton, NRadioGroup, NRadioButton } from 'naive-ui'
 export default {
   props: ['content'],
-  components: { NButton },
+  components: { NButton, NRadioGroup, NRadioButton },
   data() {
     return {
       packageCode: 'npm install naive-ui',

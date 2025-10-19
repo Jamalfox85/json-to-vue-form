@@ -4,7 +4,12 @@ export default function generateComponent(formFields) {
 
   const exportTemplate = `<template>
 ${indent(1)}<n-form ref="formRef" @submit.prevent="handleSubmit" :model="formData" :rules="rules">
-${formFieldChunks.map((c) => indent(2) + c.trimStart()).join('\n')}
+${formFieldChunks
+  .map((c) => {
+    if (!c) return ''
+    return indent(2) + c.trimStart()
+  })
+  .join('\n')}
 ${indent(2)}<n-form-item>
 ${indent(3)}<n-button type="primary" @click="handleSubmit">Submit</n-button>
 ${indent(2)}</n-form-item>
@@ -23,11 +28,13 @@ ${indent(1)}</n-form>
 </template>
 `
 
-  const script = generateComponentScript(formFields)
+  let optionsScript = generateComponentScriptOptions(formFields)
+  let compositionScript = generateComponentScriptComposition(formFields)
 
   return {
-    exportCode: exportTemplate + script,
-    previewCode: previewTemplate + script,
+    exportOptionsCode: exportTemplate + optionsScript,
+    exportCompositionCode: exportTemplate + compositionScript,
+    previewCode: previewTemplate + optionsScript,
   }
 }
 
@@ -71,7 +78,7 @@ function generateFormFieldChunks(formFields, previewOnly = false) {
   return formFieldChunks
 }
 
-function generateComponentScript(formFields) {
+function generateComponentScriptOptions(formFields) {
   const componentMapping = {
     text: 'NInput',
     email: 'NInput',
@@ -177,6 +184,105 @@ ${indent(1)}${componentString},
 ${indent(1)}${dataString},
 ${indent(1)}${methodsString}
 }
+</script>`
+}
+
+function generateComponentScriptComposition(formFields) {
+  const componentMapping = {
+    text: 'NInput',
+    email: 'NInput',
+    url: 'NInput',
+    phone: 'NInput',
+    address: 'NInput',
+    date: 'NDatePicker',
+    number: 'NInputNumber',
+    checkbox: 'NCheckbox',
+  }
+
+  let components = []
+  formFields.forEach((field) => {
+    const comp = componentMapping[field.type]
+    if (comp && !components.includes(comp)) {
+      components.push(comp)
+    }
+    if (field.isMultiple) {
+      switch (field.multiSelectType) {
+        case 'select':
+          components.push('NSelect')
+          break
+        case 'radio':
+          components.push('NRadioGroup', 'NRadio')
+          break
+        case 'button-group':
+          components.push('NButtonGroup')
+          break
+      }
+    }
+  })
+
+  const importString = `import { NForm, NFormItem, NButton, NTooltip, ${components.join(
+    ', ',
+  )} } from 'naive-ui'
+import { ref, reactive } from 'vue'`
+
+  // ---- Rules ----
+  const rulesString = formFields
+    .filter((field) => field.required)
+    .map(
+      (field) => `${indent(2)}${field.key}: [
+${indent(3)}{
+${indent(4)}required: true,
+${indent(4)}message: '${field.label} is required',
+${indent(4)}trigger: ['input', 'submit'],
+${indent(3)}},
+${indent(2)}]`,
+    )
+    .join(',\n')
+
+  const hasRules = formFields.some((f) => f.required)
+  const rulesBlock = hasRules ? `const rules = {\n${rulesString}\n}` : `const rules = {}`
+
+  // ---- formData ----
+  const formDataString = formFields
+    .filter((field) => field.active)
+    .map((field) => `${indent(2)}${field.key}: null`)
+    .join(',\n')
+
+  // ---- options arrays ----
+  const optionsFields = formFields
+    .filter((f) => f.isMultiple)
+    .map(
+      (field) =>
+        `const ${field.key}Options = ref([${field.options
+          .map((opt) => `{ label: '${opt.label}', value: '${opt.value}' }`)
+          .join(', ')}])`,
+    )
+    .join('\n')
+
+  // ---- submit function ----
+  const handleSubmitString = `function handleSubmit() {
+${indent(1)}formRef.value?.validate((errors) => {
+${indent(2)}if (!errors) {
+${indent(3)}console.log("✅ Submit:", formData)
+${indent(2)}} else {
+${indent(3)}console.log("❌ Validation failed:", errors)
+${indent(2)}}
+${indent(1)}})
+}`
+
+  // ---- final template ----
+  return `<script setup>
+${importString}
+
+const formRef = ref(null)
+const formData = reactive({
+${formDataString ? formDataString + '\n' : ''}})
+
+${rulesBlock}
+
+${optionsFields ? '\n' + optionsFields + '\n' : ''}
+
+${handleSubmitString}
 </script>`
 }
 
