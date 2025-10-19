@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="preview-code-pane">
+  <div class="preview-code-pane custom-scrollbar">
     <div v-if="content">
       <div class="code-block-section">
         <div class="section-header">
@@ -18,7 +18,7 @@
             ><font-awesome-icon icon="fa-solid fa-copy"
           /></n-button>
         </div>
-        <pre><code ref="codeBlock" class="language-html">{{ content }}</code></pre>
+        <pre><code ref="codeBlock" class="language-html custom-scrollbar">{{ content }}</code></pre>
       </div>
     </div>
   </div>

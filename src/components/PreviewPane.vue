@@ -1,5 +1,5 @@
 <template>
-  <div class="preview">
+  <div class="preview custom-scrollbar">
     <component :is="dynamicComponent" />
   </div>
 </template>

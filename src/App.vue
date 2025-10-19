@@ -75,7 +75,7 @@
     <div class="main">
       <div class="col-block">
         <div class="col-block-inside-block glass-bg">
-          <div class="block-wrapper">
+          <div class="block-wrapper custom-scrollbar">
             <h2>Form Templates</h2>
             <p>Choose a starting template</p>
             <div class="filters">
@@ -380,5 +380,28 @@ export default {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+}
+
+// Custom Scrollbar
+.custom-scrollbar {
+  /* 🔥 Custom Scrollbar Styles */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(10, 25, 47, 0.85); // subtle translucent dark track
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(66, 184, 131, 0.75); // green accent
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(66, 184, 131, 1); // brighter on hover
+  }
 }
 </style>
