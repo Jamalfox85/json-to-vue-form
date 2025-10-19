@@ -113,7 +113,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .preview {
   display: flex;
   flex-direction: column;
@@ -121,5 +121,13 @@ export default {
   flex-grow: 1;
   overflow-y: auto;
   padding: 1em;
+}
+.n-form-item-blank {
+  flex-direction: column;
+  align-items: flex-start !important;
+  color: #fff;
+  .preview-label {
+    margin-bottom: 4px;
+  }
 }
 </style>

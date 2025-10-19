@@ -387,7 +387,7 @@ ${indent(2)}</n-form-item>`
 const indent = (level) => '    '.repeat(level)
 function generateLabel(field, previewOnly) {
   if (previewOnly) {
-    return `${field.label}`
+    return `<div class="preview-label">${field.label}</div>`
   }
   return `<template #label>${field.label} ${generateHelperText(field)}</template>`
 }
