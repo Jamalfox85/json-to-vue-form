@@ -18,6 +18,8 @@ import { VAceEditor } from 'vue3-ace-editor'
 import debounce from 'lodash.debounce'
 import 'ace-builds/src-noconflict/mode-json'
 import 'ace-builds/src-noconflict/theme-monokai'
+import { usePostHog } from '@/composables/usePostHog'
+const { posthog } = usePostHog()
 export default {
   props: ['templateInput'],
   components: { VAceEditor },
@@ -38,6 +40,9 @@ export default {
       } else if (json[json.length - 1] === ',') {
         json = json.slice(0, -1)
       }
+      posthog.capture('json_input', {
+        length: json ? json.length : 0,
+      })
       this.$emit('jsonInput', json)
     },
   },

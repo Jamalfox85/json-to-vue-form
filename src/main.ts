@@ -15,13 +15,8 @@ const { message, dialog } = createDiscreteApi(['message', 'dialog'])
 window.$message = message
 
 /* Posthog */
-import posthog from 'posthog-js'
-
-posthog.init('phc_tyI6NFSlDC8XIOBy11OVxb84SsRp8TVRcPTyMf09WaP', {
-  api_host: 'https://us.i.posthog.com',
-  defaults: '2025-05-24',
-  person_profiles: 'always',
-})
+import { usePostHog } from './composables/usePostHog.ts'
+usePostHog()
 
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)

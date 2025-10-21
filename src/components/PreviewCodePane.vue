@@ -27,6 +27,9 @@
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css' // pick a theme you like
 import { NButton, NRadioGroup, NRadioButton } from 'naive-ui'
+import { usePostHog } from '@/composables/usePostHog'
+const { posthog } = usePostHog()
+
 export default {
   props: ['content'],
   components: { NButton, NRadioGroup, NRadioButton },
@@ -53,6 +56,9 @@ export default {
         try {
           await navigator.clipboard.writeText(content)
           window.$message.success('Code copied to clipboard!')
+          posthog.capture('code_copied', {
+            content_length: content.length,
+          })
         } catch (err) {
           console.error('Failed to copy: ', err)
         }
