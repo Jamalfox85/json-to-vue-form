@@ -391,7 +391,7 @@ ${indent(2)}</n-form-item>`
 function genNumberInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input-number id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)} />
+${indent(3)}<n-input-number id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)} ${field.min ? `:min="${field.min}"` : ''} ${field.max ? `:max="${field.max}"` : ''} />
 ${indent(2)}</n-form-item>`
 }
 
