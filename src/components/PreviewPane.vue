@@ -1,5 +1,6 @@
 <template>
   <div class="preview custom-scrollbar">
+    <small class="preview-warnings">* Preview does not currently show helper text.</small>
     <component :is="dynamicComponent" />
   </div>
 </template>
@@ -121,6 +122,11 @@ export default {
   flex-grow: 1;
   overflow-y: auto;
   padding: 1em;
+  .preview-warnings {
+    color: #ffcc00;
+    margin-bottom: 8px;
+    display: block;
+  }
 }
 .n-form-item-blank {
   flex-direction: column;

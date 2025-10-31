@@ -31,10 +31,29 @@ ${indent(1)}</n-form>
   let optionsScript = generateComponentScriptOptions(formFields)
   let compositionScript = generateComponentScriptComposition(formFields)
 
+  // Currently only needed if one element has helper text
+  let hasHelperText = formFields.some((f) => f.helperText)
+  const styleBlock = hasHelperText
+    ? `
+<style scoped>
+    .screenreader-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        white-space: nowrap;
+        border: 0;
+    }
+</style>`
+    : ''
+
   return {
-    exportOptionsCode: exportTemplate + optionsScript,
-    exportCompositionCode: exportTemplate + compositionScript,
-    previewCode: previewTemplate + optionsScript,
+    exportOptionsCode: exportTemplate + optionsScript + styleBlock,
+    exportCompositionCode: exportTemplate + compositionScript + styleBlock,
+    previewCode: previewTemplate + optionsScript + styleBlock,
   }
 }
 
@@ -400,10 +419,11 @@ function generateHelperText(field) {
     return `
 ${indent(4)}<n-tooltip trigger="hover">
 ${indent(5)}<template #trigger>
-${indent(6)}<span style="cursor: pointer; margin-left: 4px;">&#9432;</span>
+${indent(6)}<span style="cursor: pointer; margin-left: 4px;" aria-hidden="true">&#9432;</span>
 ${indent(5)}</template>
-${indent(5)}<p id="${field.key}-helper-text" role="tooltip">${field.helperText}</p>
-${indent(4)}</n-tooltip>`
+${indent(5)}<p>${field.helperText}</p>
+${indent(4)}</n-tooltip>
+${indent(4)}<p class="screenreader-only" id="${field.key}-helper-text" role="tooltip"></p>`
   }
 }
 
