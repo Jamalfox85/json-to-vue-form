@@ -11,7 +11,7 @@ ${formFieldChunks
   })
   .join('\n')}
 ${indent(2)}<n-form-item>
-${indent(3)}<n-button type="primary" @click="handleSubmit">Submit</n-button>
+${indent(3)}<n-button attr-type="submit" type="primary">Submit</n-button>
 ${indent(2)}</n-form-item>
 ${indent(1)}</n-form>
 </template>
@@ -22,7 +22,7 @@ ${indent(1)}</n-form>
   <n-form ref="formRef" @submit.prevent="handleSubmit" :model="formData" :rules="rules">
     ${formFieldChunksPreviewOnly.join('\n    ')}
     <n-form-item>
-      <n-button type="primary" @click="handleSubmit">Submit</n-button>
+      <n-button attr-type="submit" type="primary">Submit</n-button>
     </n-form-item>
   </n-form>
 </template>
@@ -291,12 +291,12 @@ function genMultiSelect(field, previewOnly) {
     case 'select':
       return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-select v-model:value="formData.${field.key}" :options="${field.key}Options" />
+${indent(3)}<n-select id="${field.key}" v-model:value="formData.${field.key}" :options="${field.key}Options" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 
     case 'radio':
       return `${indent(2)}<n-form-item path="${field.key}">
-${indent(3)}<n-radio-group v-model:value="formData.${field.key}">
+${indent(3)}<n-radio-group id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)}>
 ${indent(4)}${generateLabel(field, previewOnly)}
 ${indent(4)}<n-radio v-for="option in ${
         field.key
@@ -308,7 +308,7 @@ ${indent(2)}</n-form-item>`
 
     case 'button-group':
       return `${indent(2)}<n-form-item path="${field.key}">
-${indent(3)}<n-button-group v-model:value="formData.${field.key}">
+${indent(3)}<n-button-group id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)}>
 ${indent(4)}${generateLabel(field, previewOnly)}
 ${indent(4)}<n-button v-for="option in ${
         field.key
@@ -323,83 +323,97 @@ ${indent(2)}</n-form-item>`
 function genTextInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input v-model:value="formData.${field.key}"  />
+${indent(3)}<n-input id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genEmailInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input v-model:value="formData.${field.key}" type="email" />
+${indent(3)}<n-input id="${field.key}" v-model:value="formData.${field.key}" type="email" autocomplete="email" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genUrlInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input v-model:value="formData.${field.key}" type="url" />
+${indent(3)}<n-input id="${field.key}" v-model:value="formData.${field.key}" type="url" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genAddressInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input v-model:value="formData.${field.key}" />
+${indent(3)}<n-input id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genPhoneInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input v-model:value="formData.${field.key}" type="tel" />
+${indent(3)}<n-input id="${field.key}" v-model:value="formData.${field.key}" type="tel" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genDateInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-date-picker v-model:value="formData.${field.key}" />
+${indent(3)}<n-date-picker id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genPasswordInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input v-model:value="formData.${field.key}" type="password" />
+${indent(3)}<n-input id="${field.key}" v-model:value="formData.${field.key}" type="password" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genNumberInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-input-number v-model:value="formData.${field.key}" />
+${indent(3)}<n-input-number id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 function genCheckboxInput(field, previewOnly) {
   return `${indent(2)}<n-form-item path="${field.key}">
 ${indent(3)}${generateLabel(field, previewOnly)}
-${indent(3)}<n-checkbox v-model:value="formData.${field.key}" />
+${indent(3)}<n-checkbox id="${field.key}" v-model:value="formData.${field.key}" ${generateAllyAttributes(field)} />
 ${indent(2)}</n-form-item>`
 }
 
 // Univeral Helpers
 const indent = (level) => '    '.repeat(level)
+
 function generateLabel(field, previewOnly) {
   if (previewOnly) {
     return `<div class="preview-label">${field.label}</div>`
   }
-  return `<template #label>${field.label} ${generateHelperText(field)}</template>`
+  return `<template #label>
+${indent(4)}<label for="${field.key}">${field.label}</label>${field.helperText ? generateHelperText(field) : ''}
+${indent(3)}</template>`
 }
+
 function generateHelperText(field) {
-  return field.helperText
-    ? `
-        <n-tooltip trigger="hover">
-            <template #trigger>
-              <span style="cursor: pointer; margin-left: 4px;">&#9432;</span>
-            </template>
-            ${field.helperText}
-          </n-tooltip>
-      `
-    : ''
+  if (field.helperText) {
+    return `
+${indent(4)}<n-tooltip trigger="hover">
+${indent(5)}<template #trigger>
+${indent(6)}<span style="cursor: pointer; margin-left: 4px;">&#9432;</span>
+${indent(5)}</template>
+${indent(5)}<p id="${field.key}-helper-text" role="tooltip">${field.helperText}</p>
+${indent(4)}</n-tooltip>`
+  }
+}
+
+function generateAllyAttributes(field) {
+  let attrs = ''
+  if (field.required) {
+    attrs += 'aria-required="true" '
+  }
+  if (field.helperText) {
+    attrs += `aria-describedby="${field.key}-helper-text" `
+  }
+  return attrs.trim()
 }
